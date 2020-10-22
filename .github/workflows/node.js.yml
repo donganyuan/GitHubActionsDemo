@@ -1,29 +1,22 @@
-# This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
-
-name: Node.js CI
-
+name: GitHub Actions Build and Deploy Demo
 on:
   push:
     branches: [ 0.3-stable ]
-  pull_request:
-    branches: [ 0.3-stable ]
-
 jobs:
-  build:
-
+  build-and-deploy:
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [10.x, 12.x, 14.x]
-
     steps:
-    - uses: actions/checkout@v2
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
+    - name: Checkout
+      uses: actions/checkout@v2
       with:
-        node-version: ${{ matrix.node-version }}
-    - run: npm install
-    - run: npm run build --if-present
-    - run: npm test
+        persist-credentials: false
+    - name: Install and Build
+      run: |
+        npm install
+        npm run-script build
+    - name: Deploy
+      uses: JamesIves/github-pages-deploy-action@releases/v3
+      with:
+        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+        BRANCH: gh-pages
+        FOLDER: build
