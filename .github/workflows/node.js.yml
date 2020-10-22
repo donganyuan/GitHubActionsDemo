@@ -2,7 +2,7 @@ name: GitHub Actions Build and Deploy Demo
 on:
   push:
     branches:
-      - master
+      - 0.3-stable
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
