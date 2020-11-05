@@ -1,0 +1,198 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the master branch
+on:
+#  schedule:
+#    - cron:  '*/20 * * * *'
+  push:
+    branches: [ master ]
+#  pull_request:
+#    branches: [ master ]
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  free5gc:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - name: Check Out
+        continue-on-error: false
+        run: |
+          echo "$ uname -r"
+          uname -r
+          echo "$ go version"
+          go version
+          echo "$ go env"
+          go env
+          echo "Step1: Check Out"
+          echo "$"
+          echo "$ cd /tmp"
+          cd /tmp
+          echo "$ git clone -b master https://github.com/free5gc/free5gc.git"
+          git clone -b master https://github.com/free5gc/free5gc.git
+          echo "$ cd /tmp/free5gc"
+          cd /tmp/free5gc
+          echo "$ git submodule update --init --recursive"
+          git submodule update --init --recursive
+          echo "$ cd /tmp"
+          cd /tmp
+          echo "$ git clone -b v0.2.0 https://github.com/PrinzOwO/gtp5g.git"
+          git clone -b v0.2.0 https://github.com/PrinzOwO/gtp5g.git 
+      - name: Static Code Check
+        continue-on-error: true
+        run: |
+          echo "$"
+            echo "Step3.1: Install some necessary packages (wget,git,gcc,cmake,autoconf,libtool,pkg-config,libmnl-dev,libyaml-dev)"
+          echo "$"
+          echo "$ sudo -E apt-get install -y wget git"
+          sudo -E apt-get install -y wget git
+          echo "$ sudo -E apt-get install -y gcc cmake autoconf libtool pkg-config libmnl-dev libyaml-dev"
+          sudo -E apt-get install -y gcc cmake autoconf libtool pkg-config libmnl-dev libyaml-dev
+          echo "$"
+          echo "# Step3.1.1: Remove Old go Language Packages And Install go1.14.10 #"
+          echo "# sudo rm -rf /usr/local/go"
+          sudo rm -rf /usr/local/go
+          echo "# wget https://dl.google.com/go/go1.14.10.linux-amd64.tar.gz"
+          wget https://dl.google.com/go/go1.14.10.linux-amd64.tar.gz
+          echo "# sudo tar -C /usr/local -zxvf go1.14.10.linux-amd64.tar.gz"
+          sudo tar -C /usr/local -zxvf go1.14.10.linux-amd64.tar.gz
+          echo "$"
+          echo "# mkdir -p ~/go/{bin,pkg,src}"
+          mkdir -p ~/go/{bin,pkg,src}
+          echo 'export GOPATH=$HOME/go' >> ~/.bashrc
+          echo 'export GOROOT=/usr/local/go' >> ~/.bashrc
+          echo 'export PATH=$PATH:$GOPATH/bin:$GOROOT/bin' >> ~/.bashrc
+          source ~/.bashrc
+          echo "$"
+          echo "# Step3.1.2: Remove mongodb-org And Install mongodb #"
+          echo "$ sudo -E apt-get -y update"
+          sudo -E apt-get -y update
+          echo "$ sudo -E apt-get -y remove mongodb*"
+          sudo -E apt-get -y remove mongodb*
+          echo "$ sudo -E apt-get -y install mongodb"
+          sudo -E apt-get -y install mongodb
+          echo "$ sudo systemctl status mongodb"
+          sudo systemctl status mongodb
+          echo "$"
+          
+          echo "Step2: Static Code Check"
+          echo "$"
+          echo "$ cd /tmp/free5gc"
+          cd /tmp/free5gc
+          touch step2.txt
+          echo "This is the step2 (Static Code Check) ....." > step2.txt
+          echo "$ go get -u github.com/sirupsen/logrus"
+          go get -u github.com/sirupsen/logrus &>>step2.txt
+          echo "$ go mod download"
+          go mod download &>>step2.txt
+          cat step2.txt        
+          echo "$ go vet ./src/amf/..."
+          go vet ./src/amf/... &>>step2.txt
+          echo "$ go vet ./src/ausf/..."
+          go vet ./src/ausf/... &>>step2.txt
+          echo "$ go vet ./src/nrf/..."
+          go vet ./src/nrf/... &>>step2.txt 
+          echo "$ go vet ./src/nssf/..."
+          go vet ./src/nssf/... &>>step2.txt 
+          echo "$ go vet ./src/pcf/..."
+          go vet ./src/pcf/... &>>step2.txt 
+          echo "$ go vet ./src/smf/..."
+          go vet ./src/smf/... &>>step2.txt 
+          echo "$ go vet ./src/udm/..."
+          go vet ./src/udm/... &>>step2.txt  
+          echo "$ go vet ./src/udr/..."
+          go vet ./src/udr/... &>>step2.txt 
+          echo "$ go vet ./src/n3iwf/..."
+          go vet ./src/n3iwf/... &>>step2.txt 
+          echo "$ go vet ./src/upf/..."
+          go vet ./src/upf/... &>>step2.txt
+          cat step2.txt
+      - name: Build
+        continue-on-error: true
+        run: |
+          echo "$"
+          echo "Step3: Build"
+          echo "$"
+          echo "Step3.2: Build gtp5g"
+          echo "$"
+          echo "$ cd /tmp/gtp5g"
+          cd /tmp/gtp5g
+          echo "$ make"
+          make
+          echo "$ sudo -E make install"
+          sudo -E make install
+          echo "$"
+          echo "$ Step3.3: Build free5gc components"
+          echo "$"
+          echo "$ cd /tmp/free5gc"
+          cd /tmp/free5gc
+          echo "$ go build -o bin/amf -x src/amf/amf.go"
+          go build -o bin/amf -x src/amf/amf.go
+          echo "$ go build -o bin/ausf -x src/ausf/ausf.go"
+          go build -o bin/ausf -x src/ausf/ausf.go
+          echo "$ go build -o bin/nrf -x src/nrf/nrf.go"
+          go build -o bin/nrf -x src/nrf/nrf.go
+          echo "$ go build -o bin/nssf -x src/nssf/nssf.go"
+          go build -o bin/nssf -x src/nssf/nssf.go
+          echo "$ go build -o bin/pcf -x src/pcf/pcf.go"
+          go build -o bin/pcf -x src/pcf/pcf.go
+          echo "$ go build -o bin/smf -x src/smf/smf.go"
+          go build -o bin/smf -x src/smf/smf.go
+          echo "$ go build -o bin/udm -x src/udm/udm.go"
+          go build -o bin/udm -x src/udm/udm.go
+          echo "$ go build -o bin/udr -x src/udr/udr.go"
+          go build -o bin/udr -x src/udr/udr.go
+          echo "$ go build -o bin/n3iwf -x src/n3iwf/n3iwf.go"
+          go build -o bin/n3iwf -x src/n3iwf/n3iwf.go
+          echo "$"
+          echo "Step3.4: Build free5gc upf"
+          echo "$"
+          echo "$ cd /tmp/free5gc/src/upf"
+          cd /tmp/free5gc/src/upf
+          echo "$ rm -rf build"
+          rm -rf build
+          echo "$ mkdir -p build"
+          mkdir -p build 
+          echo "$ cd ./build"
+          cd ./build
+          echo "$ cmake .."
+          cmake .. 
+          echo "$ make"
+          make
+      - name: Test
+        continue-on-error: true
+        run: | 
+          echo "$"
+          echo "Step4: free5gc Test"
+          echo "$"
+          echo "$ cd /tmp/free5gc"
+          cd /tmp/free5gc
+          echo "$ chmod +x ./test.sh"
+          chmod +x ./test.sh
+          echo "$ (1)sudo ./test.sh TestRegistration"
+          sudo ./test.sh TestRegistration
+          echo "$ (2)sudo ./test.sh TestGUTIRegistration"
+          sudo ./test.sh TestGUTIRegistration
+          echo "$ (3)sudo ./test.sh TestServiceRequest" 
+          sudo ./test.sh TestServiceRequest 
+          echo "$ (4)sudo ./test.sh TestXnHandover"
+          sudo ./test.sh TestXnHandover
+          echo "$ (5)sudo ./test.sh TestDeregistration"
+          sudo ./test.sh TestDeregistration
+          echo "$ (6)sudo ./test.sh TestPDUSessionReleaseRequest"
+          sudo ./test.sh TestPDUSessionReleaseRequest
+          echo "$ (7)sudo ./test.sh TestPaging"
+          sudo ./test.sh TestPaging
+          echo "$ (8)sudo ./test.sh TestReSynchronisation"
+          sudo ./test.sh TestReSynchronisation
+          echo "$ (9)sudo ./test.sh TestN2Handover"
+          sudo ./test.sh TestN2Handover
+          echo "$ (10)sudo ./test.sh TestNon3GPP"
+          sudo ./test.sh TestNon3GPP
+          echo "$"
+          echo "Completed!!!"
