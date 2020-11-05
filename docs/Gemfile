@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 
 # jekyll, which builds it all
-gem 'jekyll', '~>1.0'
+gem 'jekyll', '~>3.6'
 
 # JSON
 gem 'json'
