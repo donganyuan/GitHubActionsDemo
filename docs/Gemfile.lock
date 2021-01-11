@@ -29,7 +29,7 @@ GEM
       posix-spawn (~> 0.3.6)
       yajl-ruby (~> 1.1.0)
     rb-fsevent (0.9.3)
-    redcarpet (2.2.2)
+    redcarpet (3.5.1)
     safe_yaml (0.7.1)
     sass (3.2.9)
     syntax (1.0.0)
